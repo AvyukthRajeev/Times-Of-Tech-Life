@@ -1,1 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DocSaral — Understand Any Indian Document Instantly</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --surface2: #1a1a1a;
+      --border: rgba(255,255,255,0.08);
+      --accent: #F59E0B;
+      --accent2: #FCD34D;
+      --text: #F5F5F0;
+      --muted: #888880;
+      --danger: #EF4444;
+      --success: #22C55E;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 1.25rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .nav-cta {
+      background: var(--accent);
+      color: #0a0a0a;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.5rem 1.25rem;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 8rem 1.5rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.25);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.35rem 1rem;
+      border-radius: 100px;
+      margin-bottom: 2rem;
+    }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      max-width: 800px;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 3rem;
+      line-height: 1.75;
+    }
+    .hero-form {
+      display: flex; gap: 0.75rem;
+      flex-wrap: wrap; justify-content: center;
+      max-width: 480px; width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .hero-form input {
+      flex: 1; min-width: 220px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      padding: 0.85rem 1.25rem;
+      border-radius: 100px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .hero-form input:focus { border-color: rgba(245,158,11,0.5); }
+    .hero-form input::placeholder { color: var(--muted); }
+    .btn-primary {
+      background: var(--accent);
+      color: #0a0a0a;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.85rem 1.75rem;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .hero-note { font-size: 0.8rem; color: var(--muted); }
+
+    /* STATS */
+    .stats {
+      display: flex; justify-content: center; flex-wrap: wrap;
+      gap: 3rem; padding: 4rem 2rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .stat { text-align: center; }
+    .stat-number {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 2.5rem;
+      color: var(--accent);
+    }
+    .stat-label { font-size: 0.875rem; color: var(--muted); margin-top: 0.25rem; }
+
+    /* PROBLEM */
+    .section { padding: 6rem 1.5rem; max-width: 1100px; margin: 0 auto; }
+    .section-tag {
+      font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: clamp(1.75rem, 4vw, 2.75rem);
+      line-height: 1.15; letter-spacing: -0.02em;
+      max-width: 700px; margin-bottom: 1.25rem;
+    }
+    .section-sub {
+      color: var(--muted); font-size: 1.05rem;
+      max-width: 580px; line-height: 1.8;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem; margin-top: 3rem;
+    }
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.75rem;
+      transition: border-color 0.2s;
+    }
+    .problem-card:hover { border-color: rgba(245,158,11,0.3); }
+    .problem-icon {
+      font-size: 1.75rem; margin-bottom: 1rem;
+      display: block;
+    }
+    .problem-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+    }
+    .problem-card p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+
+    /* HOW IT WORKS */
+    .how-bg { background: var(--surface); }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .step {
+      position: relative;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 1.75rem;
+    }
+    .step-num {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 3rem;
+      color: rgba(245,158,11,0.15);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+    .step h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+    }
+    .step p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+
+    /* LANGUAGES */
+    .lang-grid {
+      display: flex; flex-wrap: wrap; gap: 0.75rem;
+      margin-top: 2.5rem;
+    }
+    .lang-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      cursor: default;
+    }
+    .lang-pill:hover {
+      background: rgba(245,158,11,0.1);
+      border-color: rgba(245,158,11,0.4);
+      color: var(--accent);
+    }
+
+    /* FEATURES */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem; margin-top: 3rem;
+    }
+    .feature {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+    }
+    .feature-icon {
+      width: 40px; height: 40px;
+      background: rgba(245,158,11,0.1);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+    .feature h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 1rem;
+      margin-bottom: 0.4rem;
+    }
+    .feature p { font-size: 0.875rem; color: var(--muted); line-height: 1.7; }
+
+    /* OUTPUT PREVIEW */
+    .output-preview {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-top: 3rem;
+      max-width: 640px;
+    }
+    .output-doc-tag {
+      display: inline-block;
+      background: rgba(239,68,68,0.1);
+      color: #FCA5A5;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.75rem;
+      border-radius: 100px;
+      margin-bottom: 1rem;
+    }
+    .output-item {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .output-item:last-child { border-bottom: none; }
+    .output-label {
+      font-size: 0.75rem; font-weight: 600;
+      color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.06em;
+      min-width: 80px; padding-top: 0.1rem;
+    }
+    .output-value { font-size: 0.9rem; line-height: 1.6; }
+    .tag-danger { color: #FCA5A5; }
+    .tag-warn { color: #FCD34D; }
+    .tag-ok { color: #86EFAC; }
+
+    /* WAITLIST SECTION */
+    .waitlist-section {
+      text-align: center; padding: 6rem 1.5rem;
+      background: var(--surface);
+    }
+    .waitlist-inner { max-width: 560px; margin: 0 auto; }
+    .waitlist-section h2 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: clamp(1.75rem, 4vw, 2.5rem);
+      line-height: 1.15; margin-bottom: 1rem;
+    }
+    .waitlist-section p { color: var(--muted); margin-bottom: 2.5rem; }
+    .waitlist-form {
+      display: flex; gap: 0.75rem;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .waitlist-form input {
+      flex: 1; min-width: 220px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      padding: 0.85rem 1.25rem;
+      border-radius: 100px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .waitlist-form input:focus { border-color: rgba(245,158,11,0.5); }
+    .waitlist-form input::placeholder { color: var(--muted); }
+
+    /* SUCCESS MSG */
+    .success-msg {
+      display: none;
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.3);
+      color: #86EFAC;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 2.5rem 2rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; color: var(--accent);
+      text-decoration: none; font-size: 1.1rem;
+    }
+    footer p { font-size: 0.8rem; color: var(--muted); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.7s ease both; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.35s; }
+    .delay-4 { animation-delay: 0.5s; }
+
+    @media (max-width: 600px) {
+      nav { padding: 1rem 1.25rem; }
+      .stats { gap: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">DocSaral</a>
+  <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge fade-up">🇮🇳 Built for India</div>
+  <h1 class="fade-up delay-1">
+    Understand any<br/>Indian document<br/><span>in seconds.</span>
+  </h1>
+  <p class="hero-sub fade-up delay-2">
+    GST notices, legal agreements, bank letters — uploaded in seconds, explained in plain language, in your own language. No CA required.
+  </p>
+  <form class="hero-form fade-up delay-3" id="hero-form" action="https://formspree.io/f/mqegqqpz" method="POST">
+    <input type="email" placeholder="Enter your email" required name="email"/>
+    <button type="submit" class="btn-primary">Get Early Access</button>
+  </form>
+  <p class="hero-note fade-up delay-4">Free to join. No spam. Ever.</p>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-number">63M+</div>
+    <div class="stat-label">Indian MSMEs affected</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number">10</div>
+    <div class="stat-label">Indian languages supported</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number">&lt;30s</div>
+    <div class="stat-label">Average analysis time</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number">₹0</div>
+    <div class="stat-label">Cost per document</div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<div class="section">
+  <p class="section-tag">The Problem</p>
+  <h2 class="section-title">Every day, thousands of SMBs pay penalties they didn't deserve.</h2>
+  <p class="section-sub">India's regulatory system speaks English. 63 million small business owners don't. The result is missed deadlines, avoidable penalties, and businesses destroyed by documents they simply couldn't understand.</p>
+
+  <div class="problem-grid">
+    <div class="problem-card">
+      <span class="problem-icon">📬</span>
+      <h3>Notices they can't read</h3>
+      <p>GST demands, FSSAI notices, income tax letters — all in dense English legal language that even educated business owners can't parse.</p>
+    </div>
+    <div class="problem-card">
+      <span class="problem-icon">⏰</span>
+      <h3>Deadlines buried in paragraphs</h3>
+      <p>A 30-day response window hidden inside 6 pages of legalese. By the time they find someone to explain it, the deadline has passed.</p>
+    </div>
+    <div class="problem-card">
+      <span class="problem-icon">💸</span>
+      <h3>Penalties that compound daily</h3>
+      <p>A ₹2L GST liability ignored for 30 days becomes ₹4L. A small business operating on 10% margins can't survive this — not from failure, but from paperwork.</p>
+    </div>
+    <div class="problem-card">
+      <span class="problem-icon">🧑‍💼</span>
+      <h3>CA consultations they can't afford</h3>
+      <p>₹1,000–5,000 per consultation. A kirana store with ₹8L revenue shouldn't need to pay ₹30,000 a year just to understand letters they receive.</p>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-bg">
+  <div class="section">
+    <p class="section-tag">How It Works</p>
+    <h2 class="section-title">Three steps. Under 30 seconds.</h2>
+    <p class="section-sub">No training needed. No legal knowledge required. Just upload and understand.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Upload your document</h3>
+        <p>Drop a PDF or take a photo of any government notice, legal letter, or business document. Any format works.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Select your language</h3>
+        <p>Choose from Hindi, Marathi, Tamil, Telugu, Gujarati, Bengali, Kannada, Punjabi, Malayalam, or English.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Understand instantly</h3>
+        <p>Get a plain language summary, key deadlines, risks, and exactly what you need to do — in your language, in seconds.</p>
+      </div>
+    </div>
+
+    <!-- OUTPUT PREVIEW -->
+    <div class="output-preview">
+      <div class="output-doc-tag">GST Demand Notice</div>
+      <div class="output-item">
+        <span class="output-label">Summary</span>
+        <span class="output-value">GST विभाग का कहना है कि आपने जुलाई–सितंबर 2023 की अवधि के लिए ₹47,000 कम टैक्स भरा है।</span>
+      </div>
+      <div class="output-item">
+        <span class="output-label">Deadline</span>
+        <span class="output-value tag-warn">⚠️ 30 दिन के अंदर जवाब दें — 28 April 2025 तक</span>
+      </div>
+      <div class="output-item">
+        <span class="output-label">Risk</span>
+        <span class="output-value tag-danger">🔴 जवाब न देने पर ₹47,000 अतिरिक्त penalty लगेगी</span>
+      </div>
+      <div class="output-item">
+        <span class="output-label">Action</span>
+        <span class="output-value tag-ok">✅ अपने CA से मिलें। जुलाई–सितंबर 2023 के invoices तैयार रखें।</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LANGUAGES -->
+<div class="section">
+  <p class="section-tag">Languages</p>
+  <h2 class="section-title">India speaks many languages. So does DocSaral.</h2>
+  <p class="section-sub">Get your document explained in the language you actually think in — not the language the government writes in.</p>
+
+  <div class="lang-grid">
+    <div class="lang-pill">🇮🇳 English</div>
+    <div class="lang-pill">हिंदी Hindi</div>
+    <div class="lang-pill">मराठी Marathi</div>
+    <div class="lang-pill">தமிழ் Tamil</div>
+    <div class="lang-pill">తెలుగు Telugu</div>
+    <div class="lang-pill">ગુજરાતી Gujarati</div>
+    <div class="lang-pill">বাংলা Bengali</div>
+    <div class="lang-pill">ಕನ್ನಡ Kannada</div>
+    <div class="lang-pill">ਪੰਜਾਬੀ Punjabi</div>
+    <div class="lang-pill">മലയാളം Malayalam</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="how-bg">
+  <div class="section">
+    <p class="section-tag">Features</p>
+    <h2 class="section-title">Everything you need. Nothing you don't.</h2>
+
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <h3>Instant Analysis</h3>
+        <p>Under 30 seconds from upload to understanding. Faster than calling anyone.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔍</div>
+        <h3>Deadline Detection</h3>
+        <p>Automatically pulls every deadline buried in the document. Never miss a response window again.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">⚠️</div>
+        <h3>Risk Flagging</h3>
+        <p>High, medium, and low severity risks highlighted clearly. Know what matters most.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">✅</div>
+        <h3>Action Items</h3>
+        <p>Not just what the document says — exactly what you need to do about it.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔒</div>
+        <h3>Private by Design</h3>
+        <p>Your documents aren't stored. No human reads your business information.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📱</div>
+        <h3>Works on Any Device</h3>
+        <p>Phone, tablet, laptop. Upload a photo or a PDF. It just works.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WAITLIST -->
+<div class="waitlist-section" id="waitlist">
+  <div class="waitlist-inner">
+    <h2>Stop paying penalties you don't deserve.</h2>
+    <p>Join the waitlist and be the first to access DocSaral when we launch.</p>
+    <form class="waitlist-form" id="waitlist-form" action="https://formspree.io/f/mqegqqpz" method="POST">
+      <input type="email" name="email" placeholder="Your email address" required/>
+      <button type="submit" class="btn-primary">Join Waitlist</button>
+    </form>
+    <div class="success-msg" id="success-msg">
+      ✅ You're on the list! We'll reach out when DocSaral launches.
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo">DocSaral</a>
+  <p>Built with ❤️ for Indian small businesses.</p>
+  <p style="font-size:0.8rem; color: var(--muted);">© 2025 DocSaral. All rights reserved.</p>
+</footer>
+
+<script>
+  function handleForm(formId, successId) {
+    const form = document.getElementById(formId);
+    const msg = document.getElementById(successId);
+    if (!form) return;
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const data = new FormData(form);
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: data,
+          headers: { 'Accept': 'application/json' }
+        });
+        if (res.ok) {
+          form.style.display = 'none';
+          msg.style.display = 'block';
+        }
+      } catch(err) {
+        alert('Something went wrong. Please try again.');
+      }
+    });
+  }
+
+  handleForm('hero-form', 'success-msg');
+  handleForm('waitlist-form', 'success-msg');
+</script>
+
+</body>
+</html>
